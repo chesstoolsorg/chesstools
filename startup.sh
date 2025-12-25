@@ -26,3 +26,14 @@ npm install
 
 echo "Generating docker image"
 docker build -t fen-generator .
+
+echo "Building Next.js app..."
+npm run build
+
+echo "Starting Next.js app with PM2 on port 3001..."
+pm2 delete chesstools 2>/dev/null || true
+pm2 start ecosystem.config.js
+pm2 save
+
+echo "App started with PM2. Use 'pm2 logs chesstools' to view logs."
+echo "Use 'pm2 status' to check status."
