@@ -35,6 +35,7 @@
             CI: false
   
         - name: Build & Start Server with PM2
+          if: github.ref == 'refs/heads/main' && github.event_name == 'push'
           uses: appleboy/ssh-action@master
           with:
             host: ${{ secrets.HOST_IP }}
