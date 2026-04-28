@@ -38,6 +38,7 @@ export  default function AnalysisBoard() {
     const [depth, setDepth] = useState(10);
     const [bestLine, setBestline] = useState("");
     const [possibleMate, setPossibleMate] = useState("");
+    const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
     const lichessAnalysisUrl = game.pgn().trim()
       ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
       : `https://lichess.org/analysis/${chessBoardPosition.replaceAll(" ", "_")}`;
@@ -63,25 +64,72 @@ export  default function AnalysisBoard() {
     }, [chessBoardPosition, evaluatePosition, onMessage, game]);
 
     // function onDrop(sourceSquare: Square, targetSquare: Square, piece: string) {
-      function onDrop(sourceSquare: Square, targetSquare: Square) {
+      function applyMove(sourceSquare: Square, targetSquare: Square, promotion: "q" | "r" | "b" | "n" = "q") {
+        console.log("[analysis] applyMove", { sourceSquare, targetSquare, promotion, fenBefore: game.fen() });
         const move = game.move({
           from: sourceSquare,
           to: targetSquare,
-          // promotion: piece[1].toLowerCase() ?? "q",
-          promotion: "q",
+          promotion,
         });
+
+        // illegal move
+        if (move === null) {
+          console.log("[analysis] move rejected", { sourceSquare, targetSquare, promotion });
+          return false;
+        }
+
         setPossibleMate("");
         setChessBoardPosition(game.fen());
-    
-        // illegal move
-        if (move === null) return false;
-    
         stop();
         setBestline("");
-    
+
         if (game.game_over() || game.in_draw()) return false;
-    
+
         return true;
+      }
+
+      function onDrop(sourceSquare: Square, targetSquare: Square) {
+        const movingPiece = game.get(sourceSquare);
+        const promotionRank = movingPiece?.color === "w" ? "8" : "1";
+        const isPromotionMove = movingPiece?.type === "p" && targetSquare.endsWith(promotionRank);
+        console.log("[analysis] onDrop", {
+          sourceSquare,
+          targetSquare,
+          movingPiece,
+          promotionRank,
+          isPromotionMove,
+        });
+        if (isPromotionMove) {
+          setPendingPromotion({ from: sourceSquare, to: targetSquare });
+          console.log("[analysis] promotion pending", { from: sourceSquare, to: targetSquare });
+          return false;
+        }
+        return applyMove(sourceSquare, targetSquare);
+      }
+
+      function onPromotionPieceSelect(piece?: string, promoteFromSquare?: Square, promoteToSquare?: Square) {
+        console.log("[analysis] onPromotionPieceSelect", {
+          piece,
+          promoteFromSquare,
+          promoteToSquare,
+          pendingPromotion,
+        });
+        const candidate = piece?.length === 1 ? piece : piece?.[1];
+        const normalized = candidate?.toLowerCase();
+        const promotion = (normalized === "q" || normalized === "r" || normalized === "b" || normalized === "n" ? normalized : "q") as "q" | "r" | "b" | "n";
+        console.log("[analysis] parsed promotion", { piece, candidate, normalized, promotion });
+
+        const from = promoteFromSquare ?? pendingPromotion?.from;
+        const to = promoteToSquare ?? pendingPromotion?.to;
+        if (!from || !to) {
+          console.log("[analysis] promotion squares missing", { from, to, pendingPromotion });
+          return false;
+        }
+
+        const didMove = applyMove(from, to, promotion);
+        setPendingPromotion(null);
+        console.log("[analysis] promotion result", { didMove, fenAfter: game.fen() });
+        return didMove;
       }
     
       useEffect(() => {
@@ -110,6 +158,8 @@ export  default function AnalysisBoard() {
                 onPieceDrop={onDrop}
                 boardWidth={boardWidth}
                 onBoardWidthChange={setBoardWidth}
+                promotionToSquare={pendingPromotion?.to}
+                onPromotionPieceSelect={onPromotionPieceSelect}
                 customBoardStyle={{
                   borderRadius: "8px",
                   boxShadow: "0 6px 20px rgba(2,6,23,0.2)",
@@ -152,6 +202,7 @@ export  default function AnalysisBoard() {
                     setBestline("");
                     game.reset();
                     setChessBoardPosition(game.fen());
+                    setPendingPromotion(null);
                   }}
                 >
                   Reset
@@ -163,6 +214,7 @@ export  default function AnalysisBoard() {
                     setBestline("");
                     game.undo();
                     setChessBoardPosition(game.fen());
+                    setPendingPromotion(null);
                   }}
                 >
                   Undo

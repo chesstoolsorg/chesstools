@@ -28,6 +28,7 @@ export default function PlayStockfishPage() {
   const [waiting, setWaiting] = useState(false);
   const [status, setStatus] = useState<string>("");
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
   const [boardWidth, setBoardWidth] = useState(520);
   const stockfish = useStockfish();
@@ -54,6 +55,7 @@ export default function PlayStockfishPage() {
     setStatus("");
     setWaiting(false);
     setMoveHistory([]);
+    setPendingPromotion(null);
     stockfish.init();
     stockfish.setStrength(level, selectedLevel.eloValue);
     // eslint-disable-next-line
@@ -83,20 +85,69 @@ export default function PlayStockfishPage() {
   };
 
   // User move handler
-  function onDrop(sourceSquare: Square, targetSquare: Square) {
-    if (waiting) return false;
+  function applyPlayerMove(sourceSquare: Square, targetSquare: Square, promotion: "q" | "r" | "b" | "n" = "q") {
+    console.log("[play] applyPlayerMove", { sourceSquare, targetSquare, promotion, fenBefore: game.fen() });
     const move = game.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q",
+      promotion,
     });
-    if (move === null) return false;
-    
+    if (move === null) {
+      console.log("[play] move rejected", { sourceSquare, targetSquare, promotion });
+      return false;
+    }
+
     setMoveHistory((prev) => [...prev, game.fen()]);
     setFen(game.fen());
     setTimeout(() => makeStockfishMove(), 400);
     if (game.game_over()) setStatus("Game over");
     return true;
+  }
+
+  function onDrop(sourceSquare: Square, targetSquare: Square) {
+    if (waiting) return false;
+    const movingPiece = game.get(sourceSquare);
+    const promotionRank = movingPiece?.color === "w" ? "8" : "1";
+    const isPromotionMove = movingPiece?.type === "p" && targetSquare.endsWith(promotionRank);
+    console.log("[play] onDrop", {
+      sourceSquare,
+      targetSquare,
+      movingPiece,
+      promotionRank,
+      isPromotionMove,
+    });
+    if (isPromotionMove) {
+      setPendingPromotion({ from: sourceSquare, to: targetSquare });
+      console.log("[play] promotion pending", { from: sourceSquare, to: targetSquare });
+      return false;
+    }
+
+    return applyPlayerMove(sourceSquare, targetSquare);
+  }
+
+  function onPromotionPieceSelect(piece?: string, promoteFromSquare?: Square, promoteToSquare?: Square) {
+    console.log("[play] onPromotionPieceSelect", {
+      piece,
+      promoteFromSquare,
+      promoteToSquare,
+      pendingPromotion,
+    });
+    const candidate = piece?.length === 1 ? piece : piece?.[1];
+    const normalized = candidate?.toLowerCase();
+    const promotion = (normalized === "q" || normalized === "r" || normalized === "b" || normalized === "n" ? normalized : "q") as "q" | "r" | "b" | "n";
+    console.log("[play] parsed promotion", { piece, candidate, normalized, promotion });
+
+    const from = promoteFromSquare ?? pendingPromotion?.from;
+    const to = promoteToSquare ?? pendingPromotion?.to;
+    if (!from || !to) {
+      console.log("[play] promotion squares missing", { from, to, pendingPromotion });
+      return false;
+    }
+
+    const didMove = applyPlayerMove(from, to, promotion);
+    setPendingPromotion(null);
+    console.log("[play] promotion result", { didMove, fenAfter: game.fen() });
+    return didMove;
   }
 
   // Reset game
@@ -106,6 +157,7 @@ export default function PlayStockfishPage() {
     setStatus("");
     setWaiting(false);
     setMoveHistory([]);
+    setPendingPromotion(null);
   }
 
   // Take back last move (both player's move and computer's response)
@@ -117,6 +169,7 @@ export default function PlayStockfishPage() {
     setFen(game.fen());
     setMoveHistory((prev) => prev.slice(0, Math.max(0, prev.length - 2)));
     setStatus("");
+    setPendingPromotion(null);
   }
 
   return (
@@ -126,7 +179,13 @@ export default function PlayStockfishPage() {
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div ref={boardContainerRef} className="flex justify-center lg:justify-start">
-              <Chessboard position={fen} onPieceDrop={onDrop} boardWidth={boardWidth} />
+              <Chessboard
+                position={fen}
+                onPieceDrop={onDrop}
+                boardWidth={boardWidth}
+                promotionToSquare={pendingPromotion?.to}
+                onPromotionPieceSelect={onPromotionPieceSelect}
+              />
             </div>
             <div className="space-y-4 rounded-lg border border-border/70 bg-card p-4">
               <div>
