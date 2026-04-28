@@ -17,7 +17,7 @@ export default function AboutPage() {
           <ChessBoard size={260} />
         </div>
         <div className="container mx-auto px-4 relative z-10 flex flex-col items-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-center bg-linear-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-center text-primary flex items-center gap-3">
             <span>
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="inline-block text-primary">
                 <path d="M12 2L8 6H16L12 2Z" fill="currentColor" />
