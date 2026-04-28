@@ -89,8 +89,32 @@
 }
 
 @layer utilities {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 28%),
+      radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.1), transparent 24%),
+      hsl(var(--background));
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display), var(--font-inter), Arial, Helvetica, sans-serif;
+    letter-spacing: -0.03em;
+  }
+
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
 }
 
