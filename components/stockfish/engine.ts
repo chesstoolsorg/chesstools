@@ -74,6 +74,18 @@ export default function Engine() {
     }
   };
 
+  const setStrength = (skill: number, elo?: number) => {
+    if (!worker) return;
+    const normalizedSkill = Math.max(0, Math.min(20, skill));
+    worker.postMessage(`setoption name Skill Level value ${normalizedSkill}`);
+    if (elo) {
+      worker.postMessage("setoption name UCI_LimitStrength value true");
+      worker.postMessage(`setoption name UCI_Elo value ${elo}`);
+    } else {
+      worker.postMessage("setoption name UCI_LimitStrength value false");
+    }
+  };
+
   const stop = () => {
     if (worker) {
       worker.postMessage("stop");
@@ -87,5 +99,5 @@ export default function Engine() {
     setIsReady(false);
   };
 
-  return { isReady, onMessage, evaluatePosition, stop, terminate, init };
+  return { isReady, onMessage, evaluatePosition, stop, terminate, init, setStrength };
 }

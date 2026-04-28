@@ -38,6 +38,7 @@ export  default function AnalysisBoard() {
     const [depth, setDepth] = useState(10);
     const [bestLine, setBestline] = useState("");
     const [possibleMate, setPossibleMate] = useState("");
+    const lichessAnalysisUrl = `https://lichess.org/analysis/${chessBoardPosition.replaceAll(" ", "_")}`;
   
     const findBestMove = useCallback(() => {
       evaluatePosition(chessBoardPosition, 18);
@@ -165,6 +166,14 @@ export  default function AnalysisBoard() {
                   Undo
                 </button>
               </div>
+              <a
+                href={lichessAnalysisUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="block rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
+              >
+                Analyze on Lichess
+              </a>
             </div>
           </div>
         </div>

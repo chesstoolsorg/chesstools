@@ -13,12 +13,12 @@ const Chessboard = dynamic(
 );
 
 const LEVELS = [
-  { label: "Beginner", skill: 1, elo: "~800" },
-  { label: "Easy", skill: 3, elo: "~1100" },
-  { label: "Intermediate", skill: 6, elo: "~1400" },
-  { label: "Advanced", skill: 10, elo: "~1800" },
-  { label: "Master", skill: 15, elo: "~2200" },
-  { label: "Maximum", skill: 20, elo: "~2600+" },
+  { label: "Beginner", skill: 1, eloLabel: "~800", eloValue: 800, depth: 6 },
+  { label: "Easy", skill: 3, eloLabel: "~1100", eloValue: 1100, depth: 8 },
+  { label: "Intermediate", skill: 6, eloLabel: "~1400", eloValue: 1400, depth: 10 },
+  { label: "Advanced", skill: 10, eloLabel: "~1800", eloValue: 1800, depth: 12 },
+  { label: "Master", skill: 15, eloLabel: "~2200", eloValue: 2200, depth: 14 },
+  { label: "Maximum", skill: 20, eloLabel: "~2600+", eloValue: 2600, depth: 16 },
 ];
 
 export default function PlayStockfishPage() {
@@ -31,6 +31,8 @@ export default function PlayStockfishPage() {
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
   const [boardWidth, setBoardWidth] = useState(520);
   const stockfish = useStockfish();
+  const selectedLevel = LEVELS.find((entry) => entry.skill === level) ?? LEVELS[0];
+  const lichessAnalysisUrl = `https://lichess.org/analysis/${fen.replaceAll(" ", "_")}`;
 
   useEffect(() => {
     function updateBoardWidth() {
@@ -52,15 +54,15 @@ export default function PlayStockfishPage() {
     setWaiting(false);
     setMoveHistory([]);
     stockfish.init();
-    // Set skill level
-    stockfish.evaluatePosition(newGame.fen(), level);
+    stockfish.setStrength(level, selectedLevel.eloValue);
     // eslint-disable-next-line
   }, [level]);
 
   // Stockfish move handler
   const makeStockfishMove = () => {
     setWaiting(true);
-    stockfish.evaluatePosition(game.fen(), 12);
+    stockfish.setStrength(level, selectedLevel.eloValue);
+    stockfish.evaluatePosition(game.fen(), selectedLevel.depth);
     stockfish.onMessage((msg) => {
       if (msg.bestMove) {
         const move = {
@@ -157,7 +159,7 @@ export default function PlayStockfishPage() {
                     >
                       <span className="flex flex-col">
                         <span>{l.label}</span>
-                        <span className="text-xs opacity-70">{l.elo}</span>
+                        <span className="text-xs opacity-70">{l.eloLabel}</span>
                       </span>
                     </Button>
                   ))}
@@ -173,6 +175,11 @@ export default function PlayStockfishPage() {
                   Take Back
                 </Button>
               </div>
+              <Button variant="outline" asChild className="w-full">
+                <a href={lichessAnalysisUrl} target="_blank" rel="noreferrer">
+                  Analyze on Lichess
+                </a>
+              </Button>
               <p className="text-sm text-muted-foreground">
                 Play against Stockfish at different levels. The higher the level, the stronger the play.
               </p>

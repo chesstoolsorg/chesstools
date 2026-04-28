@@ -38,6 +38,7 @@ export default function ChessBoardEditor() {
     return () => window.removeEventListener("resize", update);
   }, []);
   const [fenPosition, setFenPosition] = useState(game.fen());
+  const lichessAnalysisUrl = `https://lichess.org/analysis/${game.fen().replaceAll(" ", "_")}`;
   const handleSparePieceDrop = (piece: string, targetSquare: Square) => {
     const color = piece[0] as PieceColor;
     const type = piece[1].toLowerCase() as PieceType;
@@ -152,6 +153,14 @@ export default function ChessBoardEditor() {
               >
                 Flip board
               </button>
+              <a
+                href={lichessAnalysisUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
+              >
+                Analyze on Lichess
+              </a>
             </div>
             <input
               value={fenPosition}
