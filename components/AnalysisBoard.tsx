@@ -38,6 +38,7 @@ export  default function AnalysisBoard() {
     const [depth, setDepth] = useState(10);
     const [bestLine, setBestline] = useState("");
     const [possibleMate, setPossibleMate] = useState("");
+    const [gameStatus, setGameStatus] = useState("");
     const [pendingPromotion, setPendingPromotion] = useState<{ from: Square; to: Square } | null>(null);
     const lichessAnalysisUrl = game.pgn().trim()
       ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
@@ -64,6 +65,17 @@ export  default function AnalysisBoard() {
     }, [chessBoardPosition, evaluatePosition, onMessage, game]);
 
     // function onDrop(sourceSquare: Square, targetSquare: Square, piece: string) {
+      function getGameStatus() {
+        if (!game.game_over()) return "";
+        if (game.in_checkmate()) {
+          const winner = game.turn() === "w" ? "Black" : "White";
+          return `Checkmate - ${winner} wins`;
+        }
+        if (game.in_stalemate()) return "Draw by stalemate";
+        if (game.in_draw()) return "Draw";
+        return "Game over";
+      }
+
       function applyMove(sourceSquare: Square, targetSquare: Square, promotion: "q" | "r" | "b" | "n" = "q") {
         console.log("[analysis] applyMove", { sourceSquare, targetSquare, promotion, fenBefore: game.fen() });
         const move = game.move({
@@ -82,6 +94,7 @@ export  default function AnalysisBoard() {
         setChessBoardPosition(game.fen());
         stop();
         setBestline("");
+        setGameStatus(getGameStatus());
 
         if (game.game_over() || game.in_draw()) return false;
 
@@ -133,7 +146,7 @@ export  default function AnalysisBoard() {
       }
     
       useEffect(() => {
-        if (!game.game_over() || game.in_draw()) {
+        if (!game.game_over() && !game.in_draw()) {
           findBestMove();
         }
       }, [chessBoardPosition, findBestMove, game]);
@@ -146,6 +159,7 @@ export  default function AnalysisBoard() {
           inputRef.current.value = e.target.value;
           game.load(e.target.value);
           setChessBoardPosition(game.fen());
+          setGameStatus(getGameStatus());
         }
       };
       return (
@@ -203,6 +217,7 @@ export  default function AnalysisBoard() {
                     game.reset();
                     setChessBoardPosition(game.fen());
                     setPendingPromotion(null);
+                    setGameStatus("");
                   }}
                 >
                   Reset
@@ -215,11 +230,17 @@ export  default function AnalysisBoard() {
                     game.undo();
                     setChessBoardPosition(game.fen());
                     setPendingPromotion(null);
+                    setGameStatus(getGameStatus());
                   }}
                 >
                   Undo
                 </button>
               </div>
+              {gameStatus && (
+                <div className="rounded-md border border-border/70 bg-muted/40 p-3 text-sm font-medium">
+                  {gameStatus}
+                </div>
+              )}
               <a
                 href={lichessAnalysisUrl}
                 target="_blank"
