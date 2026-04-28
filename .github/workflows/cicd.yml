@@ -34,26 +34,3 @@
           env:
             CI: false
   
-        - name: Build & Start Server with PM2
-          if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-          uses: appleboy/ssh-action@master
-          with:
-            host: ${{ secrets.HOST_IP }}
-            username: ${{ secrets.HOST_USERNAME }}
-            key: ${{ secrets.HOST_KEY }}
-            port: ${{ secrets.HOST_PORT }}
-            script: |
-              cd /root/chesstools
-              git pull origin main
-              npm ci
-              npm run build
-
-              # Ensure no duplicate processes
-              if pm2 list | grep -q "chesstools"; then
-                  pm2 restart chesstools
-              else
-                  pm2 start npm --name "chesstools" -- start -- --port 3001
-              fi
-
-              pm2 save
-              pm2 status
