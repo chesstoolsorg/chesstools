@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
@@ -28,7 +28,20 @@ export default function PlayStockfishPage() {
   const [waiting, setWaiting] = useState(false);
   const [status, setStatus] = useState<string>("");
   const [moveHistory, setMoveHistory] = useState<string[]>([]);
+  const boardContainerRef = useRef<HTMLDivElement | null>(null);
+  const [boardWidth, setBoardWidth] = useState(520);
   const stockfish = useStockfish();
+
+  useEffect(() => {
+    function updateBoardWidth() {
+      const containerWidth = boardContainerRef.current?.clientWidth ?? window.innerWidth;
+      const ideal = Math.min(containerWidth - 24, Math.floor(window.innerHeight * 0.62), 620);
+      setBoardWidth(Math.max(260, ideal));
+    }
+    updateBoardWidth();
+    window.addEventListener("resize", updateBoardWidth);
+    return () => window.removeEventListener("resize", updateBoardWidth);
+  }, []);
 
   // Reset game and Stockfish on level change
   useEffect(() => {
@@ -122,42 +135,53 @@ export default function PlayStockfishPage() {
   }
 
   return (
-    <div className="mx-auto mt-8">
+    <div className="mx-auto mt-8 w-full max-w-6xl px-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Play Against Stockfish</h1>
-      <div className="flex justify-center mb-4 gap-2">
-        {LEVELS.map((l) => (
-          <Button
-            key={l.skill}
-            variant={level === l.skill ? "default" : "outline"}
-            onClick={() => setLevel(l.skill)}
-            type="button"
-          >
-            {l.label} <span className="ml-1 text-xs opacity-70">{l.elo}</span>
-          </Button>
-        ))}
-      </div>
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardContent className="space-y-4">
-          <div className="w-full mx-auto">
-            <div className="w-full max-w-3xl mx-auto">
-              <Chessboard position={fen} onPieceDrop={onDrop} />
+      <Card className="w-full mx-auto">
+        <CardContent className="space-y-4 p-4 sm:p-6">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div ref={boardContainerRef} className="flex justify-center lg:justify-start">
+              <Chessboard position={fen} onPieceDrop={onDrop} boardWidth={boardWidth} />
+            </div>
+            <div className="space-y-4 rounded-lg border border-border/70 bg-card p-4">
+              <div>
+                <p className="mb-2 text-sm font-medium">Difficulty</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {LEVELS.map((l) => (
+                    <Button
+                      key={l.skill}
+                      variant={level === l.skill ? "default" : "outline"}
+                      onClick={() => setLevel(l.skill)}
+                      type="button"
+                      className="h-auto py-2 text-left"
+                    >
+                      <span className="flex flex-col">
+                        <span>{l.label}</span>
+                        <span className="text-xs opacity-70">{l.elo}</span>
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" onClick={handleReset}>Reset</Button>
+                <Button
+                  variant="outline"
+                  onClick={handleTakeback}
+                  disabled={waiting || moveHistory.length < 1}
+                >
+                  Take Back
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Play against Stockfish at different levels. The higher the level, the stronger the play.
+              </p>
+              <div className="text-sm">
+                {waiting && <span className="text-primary">Stockfish is thinking...</span>}
+                {status && <span className="text-red-500">{status}</span>}
+              </div>
             </div>
           </div>
-          <div className="flex justify-center gap-4">
-            <Button variant="outline" onClick={handleReset}>Reset</Button>
-            <Button 
-              variant="outline" 
-              onClick={handleTakeback}
-              disabled={waiting || moveHistory.length < 1}
-            >
-              Take Back
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground text-center">
-            Play against Stockfish at different levels. The higher the level, the stronger the play.
-            {waiting && <span className="ml-2 text-primary">Stockfish is thinking...</span>}
-            {status && <span className="ml-2 text-red-500">{status}</span>}
-          </p>
         </CardContent>
       </Card>
     </div>

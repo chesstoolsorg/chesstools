@@ -7,17 +7,17 @@ import { Button } from "@/components/ui/button"
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-linear-to-b from-primary/10 to-background">
+    <div className="min-h-screen bg-linear-to-b from-primary/10 via-background to-background">
       {/* Hero Section with ChessBoard background */}
-      <section className="relative overflow-hidden py-20">
-        <div className="absolute -top-24 -left-24 opacity-10 pointer-events-none">
+      <section className="relative overflow-hidden py-20 sm:py-24">
+        <div className="pointer-events-none absolute -left-24 -top-24 opacity-10">
           <ChessBoard size={260} />
         </div>
-        <div className="absolute -bottom-24 -right-24 opacity-10 pointer-events-none">
+        <div className="pointer-events-none absolute -bottom-24 -right-24 opacity-10">
           <ChessBoard size={260} />
         </div>
-        <div className="container mx-auto px-4 relative z-10 flex flex-col items-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-center text-primary flex items-center gap-3">
+        <div className="container relative z-10 mx-auto flex max-w-6xl flex-col items-center px-4">
+          <h1 className="mb-4 flex items-center gap-3 text-center text-4xl font-bold text-primary sm:text-5xl">
             <span>
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="inline-block text-primary">
                 <path d="M12 2L8 6H16L12 2Z" fill="currentColor" />
@@ -26,17 +26,17 @@ export default function AboutPage() {
             </span>
             About chesstools.org
           </h1>
-          <p className="text-xl text-center text-gray-600 dark:text-gray-300 max-w-2xl">
+          <p className="max-w-2xl text-center text-xl text-muted-foreground">
             A project made for chess players by chess players
           </p>
         </div>
       </section>
 
       {/* Main Content in Cards */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center gap-2">
+      <section className="container mx-auto max-w-6xl px-4 py-12 sm:py-14">
+        <div className="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Card className="overflow-hidden border border-border/70 shadow-xs transition-shadow duration-300 hover:shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-muted/50">
               <span>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary">
                   <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -45,7 +45,7 @@ export default function AboutPage() {
               </span>
               <CardTitle>Our Mission</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4 pt-6 text-foreground/90">
               <p className="text-lg">
                 Welcome to <Link href="https://chesstools.org" className="text-blue-600 dark:text-blue-400 hover:underline">chesstools.org</Link> — built for the chess community.
               </p>
@@ -57,8 +57,8 @@ export default function AboutPage() {
             </CardContent>
           </Card>
           
-          <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center gap-2">
+          <Card className="overflow-hidden border border-border/70 shadow-xs transition-shadow duration-300 hover:shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-muted/50">
               <span>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary">
                   <path d="M12 2L8 6H16L12 2Z" fill="currentColor" />
@@ -67,7 +67,7 @@ export default function AboutPage() {
               </span>
               <CardTitle>Who We Are</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 pt-6">
+            <CardContent className="space-y-4 pt-6 text-foreground/90">
               <ul className="space-y-2">
                 <li className="flex items-start">
                   <span className="text-green-600 mr-2">♟️</span>
@@ -91,7 +91,7 @@ export default function AboutPage() {
         </div>
 
         {/* Image Section */}
-        <Card className="w-full overflow-hidden mb-12 border border-gray-200 dark:border-gray-800">
+        <Card className="mb-10 w-full overflow-hidden border border-border/70 shadow-xs">
           <div className="relative aspect-video w-full">
             <Image 
               src="/images/toronto-rapid.jpg" 
@@ -104,9 +104,9 @@ export default function AboutPage() {
         </Card>
 
         {/* Infrastructure & Contribution */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center gap-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Card className="overflow-hidden border border-border/70 shadow-xs transition-shadow duration-300 hover:shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-muted/50">
               <span>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary">
                   <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -114,15 +114,15 @@ export default function AboutPage() {
               </span>
               <CardTitle>Infrastructure</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 text-foreground/90">
               <p>
                 The application is hosted on a Linux 22.0 server running Docker. Our main costs are infrastructure costs and we appreciate any support.
               </p>
             </CardContent>
           </Card>
           
-          <Card className="overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center gap-2">
+          <Card className="overflow-hidden border border-border/70 shadow-xs transition-shadow duration-300 hover:shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-muted/50">
               <span>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary">
                   <path d="M12 2L8 6H16L12 2Z" fill="currentColor" />
@@ -130,7 +130,7 @@ export default function AboutPage() {
               </span>
               <CardTitle>Contribute</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 text-foreground/90">
               <p className="mb-4">
                 Have ideas for improvements or want to contribute to the project?
               </p>
@@ -147,10 +147,10 @@ export default function AboutPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-2xl mx-auto overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xs hover:shadow-md transition-shadow duration-300">
-            <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center gap-2 text-center">
+      <section className="bg-muted/30 py-16">
+        <div className="container mx-auto max-w-6xl px-4">
+          <Card className="mx-auto max-w-2xl overflow-hidden border border-border/70 shadow-xs transition-shadow duration-300 hover:shadow-md">
+            <CardHeader className="flex items-center gap-2 bg-muted/50 text-center">
               <span className="mx-auto">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="text-primary">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2" fill="none"/>
@@ -159,7 +159,7 @@ export default function AboutPage() {
               </span>
               <CardTitle className="text-center w-full">Get in Touch</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6 text-center">
+            <CardContent className="pt-6 text-center text-foreground/90">
               <p className="text-lg mb-4">
                 Have questions, suggestions, or feedback about our chess tools?
               </p>
@@ -177,7 +177,7 @@ export default function AboutPage() {
                   </svg>
                   info@chesstools.org
                 </Link>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-muted-foreground">
                   We typically respond within 24-48 hours
                 </p>
               </div>
@@ -187,8 +187,8 @@ export default function AboutPage() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-primary text-primary-foreground mt-16">
-        <div className="container mx-auto px-4 text-center">
+      <section className="mt-16 bg-primary py-16 text-primary-foreground">
+        <div className="container mx-auto max-w-6xl px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Explore More Chess Tools?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Discover our collection of chess tools designed to help you analyze, learn, and grow as a chess player.

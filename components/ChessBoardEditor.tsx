@@ -18,32 +18,7 @@ const Chessboard = dynamic(
   { ssr: false }
 );
 
-const boardWrapperBase = {
-  width: "100%",
-  margin: "1.5rem auto",
-  maxWidth: "900px",
-};
-
 type Pc = "wP" | "wN" | "wB" | "wR" | "wQ" | "wK" | "bP" | "bN" | "bB" | "bR" | "bQ" | "bK"
-
-const buttonStyle = {
-  cursor: "pointer",
-  padding: "10px 20px",
-  margin: "10px 10px 0px 0px",
-  borderRadius: "6px",
-  backgroundColor: "#f0d9b5",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-};
-
-const inputStyle = {
-  padding: "10px 20px",
-  margin: "10px 0 10px 0",
-  borderRadius: "6px",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-  width: "100%",
-};
 
 export default function ChessBoardEditor() {
   const game = useMemo(() => new Chess("8/8/8/8/8/8/8/8 w - - 0 1"), []); // empty board
@@ -53,10 +28,10 @@ export default function ChessBoardEditor() {
 
   useEffect(() => {
     function update() {
-      const padding = 48;
+      const padding = 24;
       const containerWidth = containerRef.current?.clientWidth ?? window.innerWidth;
-      const ideal = Math.min(containerWidth - 32, Math.floor(window.innerHeight * 0.6));
-      setBoardWidth(Math.max(240, ideal - padding));
+      const ideal = Math.min(containerWidth - padding, Math.floor(window.innerHeight * 0.62), 620);
+      setBoardWidth(Math.max(260, ideal));
     }
     update();
     window.addEventListener("resize", update);
@@ -107,80 +82,85 @@ export default function ChessBoardEditor() {
     }
   };
   const pieces = ["wP", "wN", "wB", "wR", "wQ", "wK", "bP", "bN", "bB", "bR", "bQ", "bK"];
-  return <div ref={containerRef} style={{
-    ...boardWrapperBase,
-    margin: "0 auto",
-  }}>
+  return <div className="mx-auto w-full max-w-6xl">
       <ChessboardDnDProvider>
-        <div>
-          <div style={{
-          display: "flex",
-          margin: `${Math.max(8, boardWidth / 32)}px ${Math.max(12, boardWidth / 8)}px`
-        }}>
-            {pieces.slice(6, 12).map(piece => 
-              {
-                const color = piece[0] as PieceColor;
-                const type = piece[1].toLowerCase() as PieceType;
-      
-                const formattedPiece = `${color}${type.toUpperCase()}` as Pc;
-      
-                return <SparePiece key={piece} piece={formattedPiece} width={boardWidth / 8} dndId="ManualBoardEditor" />
-              }
-              )
-            }
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div ref={containerRef} className="flex justify-center lg:justify-start">
+            <Chessboard
+              onBoardWidthChange={setBoardWidth}
+              boardWidth={boardWidth}
+              id="ManualBoardEditor"
+              boardOrientation={boardOrientation}
+              position={game.fen()}
+              onSparePieceDrop={handleSparePieceDrop}
+              onPieceDrop={handlePieceDrop}
+              onPieceDropOffBoard={handlePieceDropOffBoard}
+              dropOffBoardAction="trash"
+              customBoardStyle={{
+                borderRadius: "8px",
+                boxShadow: "0 6px 20px rgba(2,6,23,0.12)",
+              }}
+            />
           </div>
-          <Chessboard
-            onBoardWidthChange={setBoardWidth}
-            boardWidth={boardWidth}
-            id="ManualBoardEditor"
-            boardOrientation={boardOrientation}
-            position={game.fen()}
-            onSparePieceDrop={handleSparePieceDrop}
-            onPieceDrop={handlePieceDrop}
-            onPieceDropOffBoard={handlePieceDropOffBoard}
-            dropOffBoardAction="trash"
-            customBoardStyle={{
-              borderRadius: "8px",
-              boxShadow: "0 6px 20px rgba(2,6,23,0.12)",
-            }}
-          />
-          <div style={{
-          display: "flex",
-          margin: `${boardWidth / 32}px ${boardWidth / 8}px`
-        }}>
-        {pieces.slice(0, 6).map(piece => {
-          const color = piece[0] as PieceColor;
-          const type = piece[1].toLowerCase() as PieceType;
-
-          const formattedPiece = `${color}${type.toUpperCase()}` as Pc;
-
-          return <SparePiece key={piece} piece={formattedPiece} width={boardWidth / 8} dndId="ManualBoardEditor" />;
-        })}
+          <div className="space-y-4 rounded-lg border border-border/70 bg-card p-4">
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Black pieces</p>
+              <div className="flex flex-wrap gap-2 rounded-md bg-muted/50 p-2">
+                {pieces.slice(6, 12).map((piece) => {
+                  const color = piece[0] as PieceColor;
+                  const type = piece[1].toLowerCase() as PieceType;
+                  const formattedPiece = `${color}${type.toUpperCase()}` as Pc;
+                  return <SparePiece key={piece} piece={formattedPiece} width={40} dndId="ManualBoardEditor" />;
+                })}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">White pieces</p>
+              <div className="flex flex-wrap gap-2 rounded-md bg-muted/50 p-2">
+                {pieces.slice(0, 6).map((piece) => {
+                  const color = piece[0] as PieceColor;
+                  const type = piece[1].toLowerCase() as PieceType;
+                  const formattedPiece = `${color}${type.toUpperCase()}` as Pc;
+                  return <SparePiece key={piece} piece={formattedPiece} width={40} dndId="ManualBoardEditor" />;
+                })}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              <button
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+                onClick={() => {
+                  game.reset();
+                  setFenPosition(game.fen());
+                }}
+              >
+                Start position
+              </button>
+              <button
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+                onClick={() => {
+                  game.clear();
+                  setFenPosition(game.fen());
+                }}
+              >
+                Clear board
+              </button>
+              <button
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+                onClick={() => {
+                  setBoardOrientation(boardOrientation === "white" ? "black" : "white");
+                }}
+              >
+                Flip board
+              </button>
+            </div>
+            <input
+              value={fenPosition}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              onChange={handleFenInputChange}
+              placeholder="Paste FEN position to start editing"
+            />
           </div>
         </div>
-        <div style={{
-        display: "flex",
-        justifyContent: "center"
-      }}>
-          <button style={buttonStyle} onClick={() => {
-          game.reset();
-          setFenPosition(game.fen());
-        }}>
-            Start position
-          </button>
-          <button style={buttonStyle} onClick={() => {
-          game.clear();
-          setFenPosition(game.fen());
-        }}>
-            Clear board
-          </button>
-          <button style={buttonStyle} onClick={() => {
-          setBoardOrientation(boardOrientation === "white" ? "black" : "white");
-        }}>
-            Flip board
-          </button>
-        </div>
-        <input value={fenPosition} style={inputStyle} onChange={handleFenInputChange} placeholder="Paste FEN position to start editing" />
       </ChessboardDnDProvider>
     </div>;
 }

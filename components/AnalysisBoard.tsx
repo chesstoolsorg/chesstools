@@ -13,33 +13,6 @@ const Chessboard = dynamic(
   { ssr: false }
 );
 
-const boardWrapperBase = {
-  width: "100%",
-  margin: "1.5rem auto",
-  maxWidth: "900px",
-};
-
-// type Pc = "wP" | "wN" | "wB" | "wR" | "wQ" | "wK" | "bP" | "bN" | "bB" | "bR" | "bQ" | "bK"
-
-const buttonStyle = {
-  cursor: "pointer",
-  padding: "10px 20px",
-  margin: "10px 10px 0px 0px",
-  borderRadius: "6px",
-  backgroundColor: "#f0d9b5",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-};
-
-const inputStyle = {
-  padding: "10px 20px",
-  margin: "10px 0 10px 0",
-  borderRadius: "6px",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-  width: "100%",
-};
-
 export  default function AnalysisBoard() {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const [boardWidth, setBoardWidth] = useState<number>(480);
@@ -47,10 +20,10 @@ export  default function AnalysisBoard() {
   // Compute responsive board width based on container width and viewport height
   useEffect(() => {
     function update() {
-      const padding = 48; // account for surrounding UI
+      const padding = 24;
       const containerWidth = containerRef.current?.clientWidth ?? window.innerWidth;
-      const ideal = Math.min(containerWidth - 32, Math.floor(window.innerHeight * 0.6));
-      setBoardWidth(Math.max(240, ideal - padding));
+      const ideal = Math.min(containerWidth - padding, Math.floor(window.innerHeight * 0.62), 620);
+      setBoardWidth(Math.max(260, ideal));
     }
 
     update();
@@ -125,66 +98,75 @@ export  default function AnalysisBoard() {
         }
       };
       return (
-        <div ref={containerRef} style={boardWrapperBase}>
-          <h4>
-            Position Evaluation:{" "}
-            {possibleMate ? `#${possibleMate}` : positionEvaluation}
-            {"; "}
-            Depth: {depth}
-          </h4>
-          <h5>
-            Best line: <i>{bestLine.slice(0, 40)}</i> ...
-          </h5>
-          <input
-            ref={inputRef}
-            style={{ ...inputStyle, width: "90%" }}
-            onChange={handleFenInputChange}
-            placeholder="Paste FEN to start analysing custom position"
-          />
-          <Chessboard
-            id="AnalysisBoard"
-            position={chessBoardPosition}
-            onPieceDrop={onDrop}
-            boardWidth={boardWidth}
-            onBoardWidthChange={setBoardWidth}
-            customBoardStyle={{
-              borderRadius: "8px",
-              boxShadow: "0 6px 20px rgba(2,6,23,0.2)",
-            }}
-            customArrows={
-              bestMove
-                ? [
-                    [
-                      bestMove.substring(0, 2) as Square,
-                      bestMove.substring(2, 4) as Square,
-                      "rgb(0, 128, 0)",
-                    ],
-                  ]
-                : undefined
-            }
-          />
-          <button
-            style={buttonStyle}
-            onClick={() => {
-              setPossibleMate("");
-              setBestline("");
-              game.reset();
-              setChessBoardPosition(game.fen());
-            }}
-          >
-            reset
-          </button>
-          <button
-            style={buttonStyle}
-            onClick={() => {
-              setPossibleMate("");
-              setBestline("");
-              game.undo();
-              setChessBoardPosition(game.fen());
-            }}
-          >
-            undo
-          </button>
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div ref={containerRef} className="flex justify-center lg:justify-start">
+              <Chessboard
+                id="AnalysisBoard"
+                position={chessBoardPosition}
+                onPieceDrop={onDrop}
+                boardWidth={boardWidth}
+                onBoardWidthChange={setBoardWidth}
+                customBoardStyle={{
+                  borderRadius: "8px",
+                  boxShadow: "0 6px 20px rgba(2,6,23,0.2)",
+                }}
+                customArrows={
+                  bestMove
+                    ? [
+                        [
+                          bestMove.substring(0, 2) as Square,
+                          bestMove.substring(2, 4) as Square,
+                          "rgb(0, 128, 0)",
+                        ],
+                      ]
+                    : undefined
+                }
+              />
+            </div>
+            <div className="space-y-4 rounded-lg border border-border/70 bg-card p-4">
+              <div className="rounded-md bg-muted/50 p-3 text-sm">
+                <p className="font-medium">
+                  Position Evaluation: {possibleMate ? `#${possibleMate}` : positionEvaluation}
+                </p>
+                <p className="text-muted-foreground">Depth: {depth}</p>
+              </div>
+              <div className="rounded-md bg-muted/50 p-3 text-sm">
+                <p className="font-medium">Best line</p>
+                <p className="text-muted-foreground">{bestLine ? `${bestLine.slice(0, 60)} ...` : "Calculating..."}</p>
+              </div>
+              <input
+                ref={inputRef}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                onChange={handleFenInputChange}
+                placeholder="Paste FEN to analyze a custom position"
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  className="rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+                  onClick={() => {
+                    setPossibleMate("");
+                    setBestline("");
+                    game.reset();
+                    setChessBoardPosition(game.fen());
+                  }}
+                >
+                  Reset
+                </button>
+                <button
+                  className="rounded-md border border-input bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+                  onClick={() => {
+                    setPossibleMate("");
+                    setBestline("");
+                    game.undo();
+                    setChessBoardPosition(game.fen());
+                  }}
+                >
+                  Undo
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       );
     };
