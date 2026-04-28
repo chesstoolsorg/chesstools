@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 // import Chess from 'chess.js';
 import { Chess, PieceColor, PieceType, Square } from 'chess.js';
@@ -18,10 +18,10 @@ const Chessboard = dynamic(
   { ssr: false }
 );
 
-const boardWrapper = {
-  width: `70vw`,
-  maxWidth: "70vh",
-  margin: "3rem auto",
+const boardWrapperBase = {
+  width: "100%",
+  margin: "1.5rem auto",
+  maxWidth: "900px",
 };
 
 type Pc = "wP" | "wN" | "wB" | "wR" | "wQ" | "wK" | "bP" | "bN" | "bB" | "bR" | "bQ" | "bK"
@@ -49,6 +49,19 @@ export default function ChessBoardEditor() {
   const game = useMemo(() => new Chess("8/8/8/8/8/8/8/8 w - - 0 1"), []); // empty board
   const [boardOrientation, setBoardOrientation] = useState<"white" | "black">("white");
   const [boardWidth, setBoardWidth] = useState(360);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function update() {
+      const padding = 48;
+      const containerWidth = containerRef.current?.clientWidth ?? window.innerWidth;
+      const ideal = Math.min(containerWidth - 32, Math.floor(window.innerHeight * 0.6));
+      setBoardWidth(Math.max(240, ideal - padding));
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   const [fenPosition, setFenPosition] = useState(game.fen());
   const handleSparePieceDrop = (piece: string, targetSquare: Square) => {
     const color = piece[0] as PieceColor;
@@ -94,16 +107,15 @@ export default function ChessBoardEditor() {
     }
   };
   const pieces = ["wP", "wN", "wB", "wR", "wQ", "wK", "bP", "bN", "bB", "bR", "bQ", "bK"];
-  return <div style={{
-    ...boardWrapper,
+  return <div ref={containerRef} style={{
+    ...boardWrapperBase,
     margin: "0 auto",
-    maxWidth: "60vh"
   }}>
       <ChessboardDnDProvider>
         <div>
           <div style={{
           display: "flex",
-          margin: `${boardWidth / 32}px ${boardWidth / 8}px`
+          margin: `${Math.max(8, boardWidth / 32)}px ${Math.max(12, boardWidth / 8)}px`
         }}>
             {pieces.slice(6, 12).map(piece => 
               {
@@ -117,10 +129,21 @@ export default function ChessBoardEditor() {
               )
             }
           </div>
-          <Chessboard onBoardWidthChange={setBoardWidth} id="ManualBoardEditor" boardOrientation={boardOrientation} position={game.fen()} onSparePieceDrop={handleSparePieceDrop} onPieceDrop={handlePieceDrop} onPieceDropOffBoard={handlePieceDropOffBoard} dropOffBoardAction="trash" customBoardStyle={{
-          borderRadius: "4px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
-        }} />
+          <Chessboard
+            onBoardWidthChange={setBoardWidth}
+            boardWidth={boardWidth}
+            id="ManualBoardEditor"
+            boardOrientation={boardOrientation}
+            position={game.fen()}
+            onSparePieceDrop={handleSparePieceDrop}
+            onPieceDrop={handlePieceDrop}
+            onPieceDropOffBoard={handlePieceDropOffBoard}
+            dropOffBoardAction="trash"
+            customBoardStyle={{
+              borderRadius: "8px",
+              boxShadow: "0 6px 20px rgba(2,6,23,0.12)",
+            }}
+          />
           <div style={{
           display: "flex",
           margin: `${boardWidth / 32}px ${boardWidth / 8}px`

@@ -13,10 +13,10 @@ const Chessboard = dynamic(
   { ssr: false }
 );
 
-const boardWrapper = {
-  width: `70vw`,
-  maxWidth: "70vh",
-  margin: "3rem auto",
+const boardWrapperBase = {
+  width: "100%",
+  margin: "1.5rem auto",
+  maxWidth: "900px",
 };
 
 // type Pc = "wP" | "wN" | "wB" | "wR" | "wQ" | "wK" | "bP" | "bN" | "bB" | "bR" | "bQ" | "bK"
@@ -41,6 +41,22 @@ const inputStyle = {
 };
 
 export  default function AnalysisBoard() {
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const [boardWidth, setBoardWidth] = useState<number>(480);
+
+  // Compute responsive board width based on container width and viewport height
+  useEffect(() => {
+    function update() {
+      const padding = 48; // account for surrounding UI
+      const containerWidth = containerRef.current?.clientWidth ?? window.innerWidth;
+      const ideal = Math.min(containerWidth - 32, Math.floor(window.innerHeight * 0.6));
+      setBoardWidth(Math.max(240, ideal - padding));
+    }
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   const { evaluatePosition, stop, onMessage } = useStockfish();
     const game = useMemo(() => new Chess(), []);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -109,7 +125,7 @@ export  default function AnalysisBoard() {
         }
       };
       return (
-        <div style={boardWrapper}>
+        <div ref={containerRef} style={boardWrapperBase}>
           <h4>
             Position Evaluation:{" "}
             {possibleMate ? `#${possibleMate}` : positionEvaluation}
@@ -129,9 +145,11 @@ export  default function AnalysisBoard() {
             id="AnalysisBoard"
             position={chessBoardPosition}
             onPieceDrop={onDrop}
+            boardWidth={boardWidth}
+            onBoardWidthChange={setBoardWidth}
             customBoardStyle={{
-              borderRadius: "4px",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+              borderRadius: "8px",
+              boxShadow: "0 6px 20px rgba(2,6,23,0.2)",
             }}
             customArrows={
               bestMove
