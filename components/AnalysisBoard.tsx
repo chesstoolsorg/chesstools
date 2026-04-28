@@ -43,6 +43,7 @@ export  default function AnalysisBoard() {
     const lichessAnalysisUrl = game.pgn().trim()
       ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
       : `https://lichess.org/analysis/${chessBoardPosition.replaceAll(" ", "_")}`;
+    const generatorUrl = `/generator?fen=${encodeURIComponent(chessBoardPosition)}`;
   
     const findBestMove = useCallback(() => {
       evaluatePosition(chessBoardPosition, 18);
@@ -248,6 +249,12 @@ export  default function AnalysisBoard() {
                 className="block rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
               >
                 Analyze on Lichess
+              </a>
+              <a
+                href={generatorUrl}
+                className="block rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
+              >
+                Generate FEN Image
               </a>
             </div>
           </div>

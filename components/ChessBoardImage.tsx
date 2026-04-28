@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Image from "next/legacy/image"
@@ -18,6 +18,13 @@ const ChessBoardImage: React.FC<ChessBoardImageProps> = ({ initialFen = "rnbqkbn
   
   // Maximum reasonable length for a FEN string
   const MAX_FEN_LENGTH = 100
+
+  useEffect(() => {
+    if (initialFen) {
+      setFen(initialFen)
+      setError(null)
+    }
+  }, [initialFen])
 
   const handleFetchImage = async () => {
     setLoading(true)
@@ -82,9 +89,9 @@ const ChessBoardImage: React.FC<ChessBoardImageProps> = ({ initialFen = "rnbqkbn
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
-        <CardTitle>Chess Board Generator</CardTitle>
+        <CardTitle>Generate FEN Image</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

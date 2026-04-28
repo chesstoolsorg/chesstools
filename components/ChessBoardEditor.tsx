@@ -39,6 +39,7 @@ export default function ChessBoardEditor() {
   }, []);
   const [fenPosition, setFenPosition] = useState(game.fen());
   const lichessAnalysisUrl = `https://lichess.org/analysis/${game.fen().replaceAll(" ", "_")}`;
+  const generatorUrl = `/generator?fen=${encodeURIComponent(fenPosition)}`;
   const handleSparePieceDrop = (piece: string, targetSquare: Square) => {
     const color = piece[0] as PieceColor;
     const type = piece[1].toLowerCase() as PieceType;
@@ -160,6 +161,12 @@ export default function ChessBoardEditor() {
                 className="rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
               >
                 Analyze on Lichess
+              </a>
+              <a
+                href={generatorUrl}
+                className="rounded-md border border-input bg-background px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
+              >
+                Generate FEN Image
               </a>
             </div>
             <input

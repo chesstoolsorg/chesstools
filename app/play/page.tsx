@@ -36,6 +36,7 @@ export default function PlayStockfishPage() {
   const lichessAnalysisUrl = game.pgn().trim()
     ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
     : `https://lichess.org/analysis/${fen.replaceAll(" ", "_")}`;
+  const generatorUrl = `/generator?fen=${encodeURIComponent(fen)}`;
 
   useEffect(() => {
     function updateBoardWidth() {
@@ -220,6 +221,11 @@ export default function PlayStockfishPage() {
               <Button variant="outline" asChild className="w-full">
                 <a href={lichessAnalysisUrl} target="_blank" rel="noreferrer">
                   Analyze on Lichess
+                </a>
+              </Button>
+              <Button variant="outline" asChild className="w-full">
+                <a href={generatorUrl}>
+                  Generate FEN Image
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground">
