@@ -240,7 +240,7 @@ export default function EstimatorPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-8">
+    <div className="max-w-2xl mx-auto mt-8 px-4 sm:px-6">
       <h1 className="text-3xl font-bold mb-6 text-center">{ratingSystem === 'cfc' ? 'Canadian Ratings Estimator' : 'FIDE Ratings Estimator'}</h1>
       <div className="flex justify-center mb-4 gap-2">
         {RATING_SYSTEMS.map((sys) => (
@@ -255,8 +255,8 @@ export default function EstimatorPage() {
         ))}
       </div>
       <Card>
-        <CardContent className="py-6">
-          <form className="space-y-4 p-6" onSubmit={handleEstimate}>
+        <CardContent className="p-4 sm:p-6">
+          <form className="space-y-5 p-2 sm:p-4" onSubmit={handleEstimate}>
             <div className="flex flex-wrap gap-4 mb-4">
               <div className="flex-1 min-w-[180px] mb-4">
                 <label className="block text-sm font-medium mb-1">Your current rating:</label>
@@ -477,7 +477,7 @@ export default function EstimatorPage() {
           </form>
         </CardContent>
       </Card>
-      <p className="text-sm text-muted-foreground text-center mt-4">
+      <p className="text-sm text-muted-foreground text-center mt-4 mb-8 sm:mb-14">
         Estimate your new {ratingSystem === 'cfc' ? 'Canadian Chess Federation' : 'FIDE'} rating based on your results and opponents.
       </p>
     </div>
