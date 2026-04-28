@@ -38,7 +38,9 @@ export  default function AnalysisBoard() {
     const [depth, setDepth] = useState(10);
     const [bestLine, setBestline] = useState("");
     const [possibleMate, setPossibleMate] = useState("");
-    const lichessAnalysisUrl = `https://lichess.org/analysis/${chessBoardPosition.replaceAll(" ", "_")}`;
+    const lichessAnalysisUrl = game.pgn().trim()
+      ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
+      : `https://lichess.org/analysis/${chessBoardPosition.replaceAll(" ", "_")}`;
   
     const findBestMove = useCallback(() => {
       evaluatePosition(chessBoardPosition, 18);

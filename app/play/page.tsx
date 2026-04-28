@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import dynamic from "next/dynamic";
@@ -23,7 +23,7 @@ const LEVELS = [
 
 export default function PlayStockfishPage() {
   const [level, setLevel] = useState(1);
-  const [game, setGame] = useState(() => new Chess());
+  const game = useMemo(() => new Chess(), []);
   const [fen, setFen] = useState(game.fen());
   const [waiting, setWaiting] = useState(false);
   const [status, setStatus] = useState<string>("");
@@ -32,7 +32,9 @@ export default function PlayStockfishPage() {
   const [boardWidth, setBoardWidth] = useState(520);
   const stockfish = useStockfish();
   const selectedLevel = LEVELS.find((entry) => entry.skill === level) ?? LEVELS[0];
-  const lichessAnalysisUrl = `https://lichess.org/analysis/${fen.replaceAll(" ", "_")}`;
+  const lichessAnalysisUrl = game.pgn().trim()
+    ? `https://lichess.org/analysis/pgn/${encodeURIComponent(game.pgn())}`
+    : `https://lichess.org/analysis/${fen.replaceAll(" ", "_")}`;
 
   useEffect(() => {
     function updateBoardWidth() {
@@ -47,9 +49,8 @@ export default function PlayStockfishPage() {
 
   // Reset game and Stockfish on level change
   useEffect(() => {
-    const newGame = new Chess();
-    setGame(newGame);
-    setFen(newGame.fen());
+    game.reset();
+    setFen(game.fen());
     setStatus("");
     setWaiting(false);
     setMoveHistory([]);
@@ -72,10 +73,8 @@ export default function PlayStockfishPage() {
         };
         const moveResult = game.move(move);
         if (moveResult) {
-          setGame(new Chess(game.fen()));
           setFen(game.fen());
-          // Save position to history
-          setMoveHistory([...moveHistory, game.fen()]);
+          setMoveHistory((prev) => [...prev, game.fen()]);
         }
         setWaiting(false);
         if (game.game_over()) setStatus("Game over");
@@ -93,10 +92,7 @@ export default function PlayStockfishPage() {
     });
     if (move === null) return false;
     
-    // Save current position to history before Stockfish responds
-    setMoveHistory([...moveHistory, game.fen()]);
-    
-    setGame(new Chess(game.fen()));
+    setMoveHistory((prev) => [...prev, game.fen()]);
     setFen(game.fen());
     setTimeout(() => makeStockfishMove(), 400);
     if (game.game_over()) setStatus("Game over");
@@ -105,9 +101,8 @@ export default function PlayStockfishPage() {
 
   // Reset game
   function handleReset() {
-    const newGame = new Chess();
-    setGame(newGame);
-    setFen(newGame.fen());
+    game.reset();
+    setFen(game.fen());
     setStatus("");
     setWaiting(false);
     setMoveHistory([]);
@@ -116,23 +111,11 @@ export default function PlayStockfishPage() {
   // Take back last move (both player's move and computer's response)
   function handleTakeback() {
     if (waiting || moveHistory.length < 1) return;
-    
-    // Get the position before the last move pair
-    let targetPosition;
-    if (moveHistory.length >= 2) {
-      // Take back both computer and player moves
-      targetPosition = moveHistory[moveHistory.length - 2];
-      setMoveHistory(moveHistory.slice(0, -2));
-    } else {
-      // Only the player has moved, go back to start
-      targetPosition = new Chess().fen();
-      setMoveHistory([]);
-    }
-    
-    // Set the board to that position
-    const newGame = new Chess(targetPosition);
-    setGame(newGame);
-    setFen(newGame.fen());
+
+    game.undo();
+    game.undo();
+    setFen(game.fen());
+    setMoveHistory((prev) => prev.slice(0, Math.max(0, prev.length - 2)));
     setStatus("");
   }
 
