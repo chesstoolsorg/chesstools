@@ -19,6 +19,9 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'ChessTools',
   description: 'ChessTools for organizers, players, and arbiters worldwide.',
+  icons: {
+    icon: [{ url: '/chesstools.svg', type: 'image/svg+xml', sizes: 'any' }],
+  },
 }
 
 export default function RootLayout({
