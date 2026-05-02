@@ -140,14 +140,6 @@ const Navbar = () => {
                     description="Generate GIFs from Lichess games"
                   />
                 </DropdownToolSection>
-                <DropdownMenuSeparator className="my-1" />
-                <DropdownToolSection label="Live">
-                  <MenuToolLink
-                    href="/live"
-                    title="Live claims relay"
-                    description="Watch games from Chess Claim Tool over WebSocket (local)"
-                  />
-                </DropdownToolSection>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -236,10 +228,6 @@ const Navbar = () => {
               </Link>
               <Link href="https://gif.chesstools.org/" className="rounded-xl px-3 py-2 text-base font-medium transition-colors hover:bg-muted">
                 Chess GIF Generator
-              </Link>
-              <p className="px-3 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/90">Live</p>
-              <Link href="/live" className="rounded-xl px-3 py-2 text-base font-medium transition-colors hover:bg-muted">
-                Live claims relay
               </Link>
 
               <p className="px-3 pt-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Arbiters tools</p>
