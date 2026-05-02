@@ -17,6 +17,9 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
+// TODO: Restore Live claims relay — `app/live/page.tsx` + Player tools → Live (`/live`, Chess Claim Tool WebSocket).
+// TODO: Restore Claim scanner — `app/claims/page.tsx` + Arbiters tools → Claims (`/claims`, hosted Claim API).
+
 /** Matches pill triggers; DropdownMenu has no built-in chevron here. */
 const triggerClass = cn(
   navigationMenuTriggerStyle(),
@@ -162,14 +165,6 @@ const Navbar = () => {
                     description="Process Canadian tournament CSVs with CFC ratings"
                   />
                 </DropdownToolSection>
-                <DropdownMenuSeparator className="my-1" />
-                <DropdownToolSection label="Claims">
-                  <MenuToolLink
-                    href="/claims"
-                    title="Claim scanner"
-                    description="Scan PGN for draw claims via hosted Claim API"
-                  />
-                </DropdownToolSection>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -237,10 +232,6 @@ const Navbar = () => {
               </Link>
               <Link href="https://cfc.chesstools.org/" className="rounded-xl px-3 py-2 text-base font-medium transition-colors hover:bg-muted">
                 CFC Ratings Processor
-              </Link>
-              <p className="px-3 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/90">Claims</p>
-              <Link href="/claims" className="rounded-xl px-3 py-2 text-base font-medium transition-colors hover:bg-muted">
-                Claim scanner
               </Link>
 
               <Link href="/about" className="mt-2 rounded-xl px-3 py-2 text-base font-medium transition-colors hover:bg-muted">
