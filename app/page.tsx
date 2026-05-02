@@ -11,14 +11,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Sparkles, ArrowRight, Trophy, Users } from "lucide-react";
-
+import { Sparkles, ArrowRight, Trophy, Users, Globe } from "lucide-react";
 
 const toolCards = [
   { title: "Board", description: "Interactive board to build positions", href: "/board", icon: ArrowRight, external: false },
   { title: "Generator", description: "Convert FEN to PNG images", href: "/generator", icon: Sparkles, external: false },
   { title: "Analysis", description: "Analyze games with Stockfish", href: "/analysis", icon: Trophy, external: false },
-  { title: "Estimator", description: "Estimate player ratings", href: "/estimator", icon: Users, external: false },
+  {
+    title: "Canada (CFC) ratings",
+    description: "Estimate CFC rating changes from scores and opponents",
+    href: "/estimator/canada",
+    icon: Users,
+    external: false,
+  },
+  {
+    title: "FIDE ratings",
+    description: "Per-game FIDE estimate with optional K-factor",
+    href: "/estimator/fide",
+    icon: Globe,
+    external: false,
+  },
 ];
 
 const showcaseCards = [
@@ -69,7 +81,10 @@ export default function Home() {
                   <Link href="/analysis">Analyze games</Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/estimator">Estimate ratings</Link>
+                  <Link href="/estimator/canada">Canada (CFC) ratings</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/estimator/fide">FIDE ratings</Link>
                 </Button>
                 <Button size="lg" variant="secondary" asChild>
                   <Link href="https://api.chesstools.org">Ratings API</Link>
@@ -112,7 +127,7 @@ export default function Home() {
               Each tool is built to do one job cleanly, with enough flexibility for players, coaches, organizers, and developers.
             </p>
           </div>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {toolCards.map((tool) => {
               const Icon = tool.icon;
 
