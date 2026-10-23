@@ -3,5 +3,5 @@ chess==1.11.2
 fentoimage==0.1.0
 future==1.0.0
 macholib==1.16.4
-Pillow==12.2.0
+Pillow==13.0.0
 six==1.17.0
